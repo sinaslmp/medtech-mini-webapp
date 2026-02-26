@@ -2,5 +2,5 @@ fastapi>=0.115.2
 uvicorn[standard]
 pillow
 python-multipart>=0.0.18
-opencv-python
+opencv-python-headless
 numpy
