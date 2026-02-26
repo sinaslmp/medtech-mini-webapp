@@ -5,8 +5,8 @@ A mini web-app that simulates medical image phases:
 - **Venous**: applies gaussian smoothing
 
 ## Live Demo
-Frontend: <GITHUB_PAGES_URL>  
-Backend: <HF_SPACE_URL>
+Frontend: https://sinaslmp.github.io/medtech-mini-webapp/
+Backend: https://sinaslmp-medtech-phase-backend.hf.space
 
 ## How to use
 1. Upload a JPG/PNG image
