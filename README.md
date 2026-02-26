@@ -23,8 +23,8 @@ Original phase simulator (as initially submitted).
 ## feature/organ-detection
 Extended version including AI-powered organ detection.
 
-- Frontend: [NEW FEATURE FRONTEND URL HERE]
-- Backend: [NEW FEATURE BACKEND URL HERE]
+- Frontend: https://sinaslmp.github.io/medtech-mini-webapp-organ-detection/
+- Backend: https://sinaslmp-medtech-phase-backend-organ-detection.hf.space
 
 ---
 
