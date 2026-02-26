@@ -23,6 +23,15 @@
           </span>
           <span v-else>Elabora immagine</span>
         </button>
+
+        <!-- NEW ANALYZE BUTTON -->
+        <button class="btn" :disabled="!file || analyzing" @click="analyze">
+          <span v-if="analyzing" class="btnContent">
+            <span class="spinner" aria-hidden="true"></span>
+            Analyzing...
+          </span>
+          <span v-else>Analyze</span>
+        </button>
       </div>
 
       <p class="hint">
@@ -48,24 +57,45 @@
       </div>
     </div>
 
+    <!-- NEW ANALYZE RESULT (added below images as required) -->
+    <div v-if="analyzeResult" class="card" style="margin-top:16px;">
+      <h2 class="subtitle">
+        Analyze Result
+        <span v-if="analyzeResult.detected"> ✅ Liver detected</span>
+        <span v-else> ❌ No liver detected</span>
+      </h2>
+      <pre style="margin:0; font-size:13px; white-space:pre-wrap;">
+        {{ prettyAnalyze }}
+      </pre>
+    </div>
+
     <div v-if="done" class="done">✅ Elaborazione completata</div>
     <div v-if="error" class="error">⚠️ {{ error }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL as string;
 
 const file = ref<File | null>(null);
 const phase = ref<"arterial" | "venous">("arterial");
 const loading = ref(false);
+const analyzing = ref(false);
 
 const originalUrl = ref<string>("");
 const processedUrl = ref<string>("");
 const done = ref(false);
 const error = ref<string>("");
+
+const analyzeResult = ref<any>(null);
+
+const prettyAnalyze = computed(() =>
+  analyzeResult.value
+    ? JSON.stringify(analyzeResult.value, null, 2)
+    : ""
+);
 
 function onFile(e: Event) {
   const input = e.target as HTMLInputElement;
@@ -74,6 +104,7 @@ function onFile(e: Event) {
   done.value = false;
   error.value = "";
   processedUrl.value = "";
+  analyzeResult.value = null;
 
   if (originalUrl.value) URL.revokeObjectURL(originalUrl.value);
   originalUrl.value = f ? URL.createObjectURL(f) : "";
@@ -114,6 +145,40 @@ async function process() {
     error.value = e instanceof Error ? e.message : String(e);
   } finally {
     loading.value = false;
+  }
+}
+
+async function analyze() {
+  if (!file.value) return;
+  if (!BACKEND_URL) {
+    error.value = "Missing VITE_BACKEND_URL env var.";
+    return;
+  }
+
+  analyzing.value = true;
+  error.value = "";
+
+  try {
+    const form = new FormData();
+    form.append("file", file.value);
+
+    const res = await fetch(`${BACKEND_URL}/analyze`, {
+      method: "POST",
+      body: form,
+    });
+
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(txt || `Analyze failed: ${res.status}`);
+    }
+
+    const data = await res.json();
+    analyzeResult.value = data;
+  } catch (e) {
+    analyzeResult.value = null;
+    error.value = e instanceof Error ? e.message : String(e);
+  } finally {
+    analyzing.value = false;
   }
 }
 </script>

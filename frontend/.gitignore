@@ -25,3 +25,13 @@ dist-ssr
 
 .env
 .env.*.local
+
+venv
+venv/
+__pycache__/
+*.pyc
+*.pyo
+beckend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/venv/
